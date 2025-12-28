@@ -1,31 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import '../services/camera_service.dart';
-import '../screens/counting_screen.dart';
-import '../helpers/ui_helpers.dart';
 
-class BottomToolbar extends StatefulWidget {
-  const BottomToolbar({super.key});
+import '../screens/counting_screen.dart';import '../helpers/ui_helpers.dart';
+import '../services/camera_service.dart'; // Đảm bảo đã import CameraService
 
-  @override
-  State<BottomToolbar> createState() => _BottomToolbarState();
-}
+// --- THAY ĐỔI 1: Chuyển thành StatelessWidget và thêm callback ---
+class BottomToolbar extends StatelessWidget {
+  /// Callback này sẽ được gọi khi người dùng nhấn nút chụp ảnh.
+  /// CameraScreen sẽ cung cấp hàm để thực thi.
+  final VoidCallback onTakePhoto;
 
-class _BottomToolbarState extends State<BottomToolbar> {
-  final ImagePicker _picker = ImagePicker(); // Khởi tạo ImagePicker
+  const BottomToolbar({super.key, required this.onTakePhoto});
 
   // Hàm để xử lý việc chọn ảnh từ thư viện
-  Future<void> _pickImageFromGallery() async {
+  Future<void> _pickImageFromGallery(BuildContext context) async {
+    final ImagePicker picker = ImagePicker();
     try {
       // Sử dụng picker để mở thư viện ảnh và chờ người dùng chọn
       final XFile? pickedFile =
-      await _picker.pickImage(source: ImageSource.gallery);
+      await picker.pickImage(source: ImageSource.gallery);
 
-      // Thêm kiểm tra `mounted` để đảm bảo widget vẫn còn trong cây widget trước khi điều hướng
-      if (!mounted || pickedFile == null) return;
+      // Nếu không có context hợp lệ hoặc không có ảnh nào được chọn, hãy thoát ra
+      if (!context.mounted || pickedFile == null) return;
 
-      // Nếu người dùng đã chọn ảnh, hãy điều hướng đến CountingScreen và truyền đường dẫn của ảnh qua
+      // Nếu người dùng đã chọn ảnh, hãy điều hướng đến CountingScreen
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -33,8 +32,8 @@ class _BottomToolbarState extends State<BottomToolbar> {
         ),
       );
     } catch (e) {
-      if (mounted) {
-        // Sử dụng UIHelper để hiển thị lỗi nếu có sự cố khi chọn ảnh
+      if (context.mounted) {
+        // Sử dụng UIHelper để hiển thị lỗi nếu có sự cố
         UIHelper.showErrorSnackBar(
             context, 'Không thể mở thư viện ảnh: $e');
       }
@@ -58,11 +57,11 @@ class _BottomToolbarState extends State<BottomToolbar> {
               crossAxisAlignment: CrossAxisAlignment.center,
               // Căn giữa các widget theo chiều dọc
               children: <Widget>[
-                _buildAlbumButton(), // Nút Album bên trái
+                _buildAlbumButton(context), // Nút Album bên trái
 
                 _buildCaptureButton(), // Nút chụp ảnh ở giữa
 
-                _buildHistoryButton(), // Nút History bên phải
+                _buildHistoryButton(context), // Nút History bên phải
               ],
             ),
           ),
@@ -72,16 +71,15 @@ class _BottomToolbarState extends State<BottomToolbar> {
   }
 
   // Nút Album
-  Widget _buildAlbumButton() {
+  Widget _buildAlbumButton(BuildContext context) {
     return GestureDetector(
-      onTap: _pickImageFromGallery, // Gọi hàm chọn ảnh khi bấm vào
+      onTap: () => _pickImageFromGallery(context), // Gọi hàm chọn ảnh khi bấm vào
       child: Container(
         width: 60,
         height: 60,
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.2),
           borderRadius: BorderRadius.circular(8.0),
-          // image: DecorationImage(image: ...), // Có thể thêm ảnh thumbnail ở đây
         ),
         child: const Icon(
           Icons.photo_library,
@@ -94,18 +92,10 @@ class _BottomToolbarState extends State<BottomToolbar> {
 
   /// Nút chụp ảnh
   Widget _buildCaptureButton() {
-    final cameraService = Provider.of<CameraService>(context, listen: false);
     return GestureDetector(
-      onTap: () async {
-        try {
-          // Bọc trong try-catch để xử lý lỗi nếu có
-          await cameraService.takePictureAndNavigate(context);
-        } catch (e) {
-          if (mounted) {
-            UIHelper.showErrorSnackBar(context, 'Chụp ảnh thất bại: $e');
-          }
-        }
-      },
+      // --- THAY ĐỔI 2: Gọi callback onTakePhoto ---
+      // Khi nhấn nút, nó sẽ thực thi hàm mà CameraScreen đã truyền vào.
+      onTap: onTakePhoto,
       child: Container(
         width: 70,
         height: 70,
@@ -133,8 +123,8 @@ class _BottomToolbarState extends State<BottomToolbar> {
     );
   }
 
-/// Nút History
-  Widget _buildHistoryButton() {
+  /// Nút History
+  Widget _buildHistoryButton(BuildContext context) {
     return GestureDetector(
       onTap: () {
         UIHelper.showMaintenanceSnackBar(context);

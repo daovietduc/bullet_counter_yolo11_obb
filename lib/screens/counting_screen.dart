@@ -202,13 +202,19 @@ class _CountingScreenState extends State<CountingScreen> {
             title: RichText(
               text: TextSpan(
                 children: [
-                  const TextSpan(text: 'TARGET: ',
-                      style: TextStyle(color: Colors.amber,
-                          fontSize: 18,
+                  const TextSpan(
+                      text: 'Target: ',
+                      style: TextStyle(
+                          fontFamily: 'Lexend',
+                          color: Colors.white,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold)),
-                  TextSpan(text: '$totalCount',
-                      style: const TextStyle(color: Colors.cyanAccent,
-                          fontSize: 26,
+                  TextSpan(
+                      text: '$totalCount',
+                      style: const TextStyle(
+                          fontFamily: 'Lexend',
+                          color: Colors.orangeAccent,
+                          fontSize: 28,
                           fontWeight: FontWeight.bold)),
                 ],
               ),
@@ -267,14 +273,13 @@ class _CountingScreenState extends State<CountingScreen> {
                           fit: BoxFit.fill,
                         ),
 
-                        // Khung viền màu vàng (Optional)
+                        // Khung viền cho ảnh (Optional)
                         Positioned.fill(
                           child: IgnorePointer(
                             child: Container(
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: Colors.amber,
-                                  width: 2,
+                                  color: Colors.amber, width: 2,
                                 ),
                               ),
                             ),
@@ -324,12 +329,29 @@ class _CountingScreenState extends State<CountingScreen> {
                   // Nếu đang đếm hoặc chưa chọn mode thì nút sẽ bị khóa (màu xám)
                   onPressed: (_isCounting || _selectedMode == null) ? null : _startCounting,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber, // Màu vàng đặc trưng
+                    backgroundColor: Colors.orange,
                     disabledBackgroundColor: Colors.grey,
-                    padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 14),
+                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                   ),
-                  child: const Text('COUNT', style: TextStyle(fontSize: 22, color: Colors.black, fontWeight: FontWeight.bold)),
+                  child: const Text('COUNT',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Lexend',
+                        letterSpacing: 0,   // Giãn chữ tạo phong cách kỹ thuật (Futuristic)
+                        decoration: TextDecoration.none,
+                        shadows: [
+                          // Đổ bóng 360 độ xung quanh chữ để đảm bảo đọc được trên mọi nền ảnh
+                          Shadow(
+                            blurRadius: 15.0,
+                            color: Colors.black,
+                            offset: Offset(0, 0),
+                          ),
+                        ],
+                      )
+                  ),
                 ),
 
                 // Widget chọn đối tượng cần đếm

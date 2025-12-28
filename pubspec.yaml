@@ -43,10 +43,22 @@ flutter:
   uses-material-design: true
   # Thêm fonts, assets, và các cài đặt khác cho Flutter tại đây
   fonts:
-    - family: UTM_HelvetIns
+    - family: Lexend
       fonts:
-               - asset: assets/fonts/Lexend-Bold.ttf
-               - asset: assets/fonts/Montserrat-Bold.ttf
-               - asset: assets/fonts/SF-Pro-Display-Bold.otf
-               - asset: assets/fonts/UTM_HelvetIns.ttf
-                 weight: 700
+        - asset: assets/fonts/Lexend-Bold.ttf
+          weight: 700
+
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat-Bold.ttf
+          weight: 700
+
+    - family: SFPro
+      fonts:
+        - asset: assets/fonts/SF-Pro-Display-Bold.otf
+          weight: 700
+
+    - family: UTM_Helvet
+      fonts:
+        - asset: assets/fonts/UTM_HelvetIns.ttf
+          weight: 700

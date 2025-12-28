@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:provider/provider.dart';
+import 'dart:async'; // Import để sử dụng Timer
+
 import '../services/camera_service.dart';
 import '../widgets/bottom_toolbar.dart';
 import '../helpers/ui_helpers.dart';
@@ -10,13 +12,15 @@ import '../helpers/ui_helpers.dart';
 class CameraScreen extends StatefulWidget {
   final CameraDescription camera;
 
-  const CameraScreen({super.key, required this.camera,});
+  const CameraScreen({super.key, required this.camera});
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
 }
 
 class _CameraScreenState extends State<CameraScreen> {
+  // Biến trạng thái để điều khiển hiệu ứng flash khi chụp ảnh
+  bool _showFlashEffect = false;
 
   @override
   void initState() {
@@ -25,6 +29,23 @@ class _CameraScreenState extends State<CameraScreen> {
     // Gọi thông qua Provider để CameraService quản lý vòng đời của Controller.
     // Dùng listen: false vì trong initState không được phép rebuild widget.
     Provider.of<CameraService>(context, listen: false).initialize();
+  }
+
+  /// Hàm kích hoạt hiệu ứng "nháy" màn hình.
+  void _triggerFlashEffect() {
+    if (!mounted) return;
+    // 1. Bật lớp phủ màu trắng ngay lập tức
+    setState(() {
+      _showFlashEffect = true;
+    });
+    // 2. Sau một khoảng thời gian rất ngắn, tắt nó đi để AnimatedOpacity tạo hiệu ứng mờ dần
+    Timer(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        setState(() {
+          _showFlashEffect = false;
+        });
+      }
+    });
   }
 
   @override
@@ -63,7 +84,7 @@ class _CameraScreenState extends State<CameraScreen> {
           'BULLET COUNTER',
           style: TextStyle(
             color: Colors.amber,
-            fontFamily: 'UTM_HelvetIns', // Font chữ đặc trưng của ứng dụng
+            fontFamily: 'UTM_Helvet', // Font chữ đặc trưng của ứng dụng
             fontWeight: FontWeight.bold,
             fontSize: 24,
           ),
@@ -85,8 +106,9 @@ class _CameraScreenState extends State<CameraScreen> {
       /// Sử dụng FittedBox kết hợp với BoxFit.cover để luồng video chiếm toàn màn hình
       /// mà không bị biến dạng tỷ lệ hình ảnh.
       body: Stack(
+        fit: StackFit.expand, // Đảm bảo Stack chiếm toàn bộ không gian body
         children: [
-          // Màn hình camera preview
+          // LỚP 1: Màn hình camera preview
           SizedBox.expand(
             child: FittedBox(
               fit: BoxFit.cover,
@@ -99,15 +121,29 @@ class _CameraScreenState extends State<CameraScreen> {
             ),
           ),
 
-          // Thêm viền cho camera (overlay)
+          // LỚP 2: Viền cho camera (overlay)
           Positioned.fill(
             child: IgnorePointer(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.amber, // xám đậm chuyên nghiệp
-                    width: 2, // 1–2px là đẹp nhất
-                  ),
+              child: Padding(
+                // Padding nhẹ để các góc không dính sát mép ảnh quá
+                padding: const EdgeInsets.all(2),
+                child: CustomPaint(
+                  painter: CornersPainter(color: Colors.),
+                ),
+              ),
+            ),
+          ),
+
+          // LỚP 3: HIỆU ỨNG FLASH KHI CHỤP ẢNH
+          // Lớp này nằm trên cùng để che phủ mọi thứ khác khi được kích hoạt
+          Positioned.fill(
+            child: AnimatedOpacity(
+              opacity: _showFlashEffect ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 150), // Thời gian mờ dần
+              curve: Curves.easeOut,
+              child: IgnorePointer(
+                child: Container(
+                  color: Colors.black,
                 ),
               ),
             ),
@@ -115,16 +151,26 @@ class _CameraScreenState extends State<CameraScreen> {
         ],
       ),
 
-
       /// 3. THANH CÔNG CỤ PHÍA DƯỚI (BOTTOM BAR)
       /// Chứa nút chụp ảnh, nút thư viện và chuyển đổi camera.
       bottomNavigationBar: Container(
         color: Colors.black,
         padding: const EdgeInsets.only(bottom: 20.0),
-        child: const Column(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            BottomToolbar(), // Widget tách rời để code gọn gàng hơn
+            // Truyền một hàm callback vào BottomToolbar
+            BottomToolbar(
+              onTakePhoto: () {
+                // Khi nút chụp được nhấn, hàm callback này sẽ được gọi
+                // 1. Kích hoạt hiệu ứng "nháy" màn hình
+                _triggerFlashEffect();
+
+                // 2. Thực hiện hành động chụp ảnh
+                Provider.of<CameraService>(context, listen: false)
+                    .takePictureAndNavigate(context);
+              },
+            ),
           ],
         ),
       ),
@@ -148,4 +194,50 @@ class _CameraScreenState extends State<CameraScreen> {
       ),
     );
   }
+}
+
+/// Lớp CornersPainter: Sử dụng CustomPainter để vẽ 4 góc khung ngắm camera
+class CornersPainter extends CustomPainter {
+  final Color color;
+
+  CornersPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Chiều dài mỗi góc = 1/5 chiều rộng màn hình
+    final double dynamicLength = size.width / 5;
+
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.square;
+
+    final path = Path();
+
+    // --- Góc trên bên trái ---
+    path.moveTo(0, dynamicLength);
+    path.lineTo(0, 0);
+    path.lineTo(dynamicLength, 0);
+
+    // --- Góc trên bên phải ---
+    path.moveTo(size.width - dynamicLength, 0);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, dynamicLength);
+
+    // --- Góc dưới bên trái ---
+    path.moveTo(0, size.height - dynamicLength);
+    path.lineTo(0, size.height);
+    path.lineTo(dynamicLength, size.height);
+
+    // --- Góc dưới bên phải ---
+    path.moveTo(size.width - dynamicLength, size.height);
+    path.lineTo(size.width, size.height);
+    path.lineTo(size.width, size.height - dynamicLength);
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

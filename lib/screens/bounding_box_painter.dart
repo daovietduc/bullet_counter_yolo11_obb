@@ -153,8 +153,7 @@ class BoundingBoxPainter extends CustomPainter {
         final double side2 = (scaledVertices[2] - scaledVertices[1]).distance;
         final double smallerSide = min(side1, side2);
 
-        // Kích thước của vòng tròn và font chữ sẽ co dãn theo kích thước vật thể.
-        // Bán kính vòng tròn là 40% của cạnh ngắn hơn, không có giới hạn dưới nhưng có giới hạn trên.
+        // Kích thước của vòng tròn và font chữ sẽ co dãn theo kích thước vật thể
         final double circleRadius = min(smallerSide * 0.40, 18.0);
         final double fontSize = min(circleRadius * 0.9, 16.0); // Font chữ nhỏ hơn bán kính một chút
         final double strokeWidth = min(circleRadius * 0.12, 2.0);
@@ -163,10 +162,10 @@ class BoundingBoxPainter extends CustomPainter {
         canvas.drawCircle(
             Offset(centerX, centerY),
             circleRadius,
-            Paint()..color = Colors.white.withOpacity(0.8), // Màu nền trong suốt
+            Paint()..color = Colors.white.withOpacity(0.6), // Màu nền trong suốt
         );
 
-        // Vẽ viền cho hình tròn (màu đỏ)
+        // Vẽ viền cho hình tròn
         canvas.drawCircle(
             Offset(centerX, centerY),
             circleRadius,
