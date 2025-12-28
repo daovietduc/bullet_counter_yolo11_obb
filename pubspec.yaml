@@ -1,0 +1,52 @@
+name: bullet_counter
+description: "A new Flutter project."
+publish_to: 'none' # Ngăn chặn việc xuất bản riêng
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  camera: ^0.11.3   # Thư viện điều khiển camera
+  provider: ^6.0.5  # Thư viện quản lý trạng thái
+  path_provider: ^2.1.5   # Để lưu ảnh
+  image_picker: ^1.1.2 # Để chọn ảnh từ thư viện
+  image_gallery_saver_plus: ^4.0.1 # Lưu ảnh vào bộ nhớ
+  permission_handler: ^11.3.1 # Cần thiết để xử lý quyền truy cập bộ nhớ
+  tflite_flutter: ^0.12.1
+  image: ^4.1.3
+  screenshot: ^3.0.0
+  shared_preferences: ^2.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+
+  assets:
+    # Khai báo tường minh file model và labels
+    - assets/yolo11l-obb_float32.tflite
+    - assets/yolo11l-obb_float16.tflite
+    - assets/yolo11m-obb_float32.tflite
+    - assets/yolo11s-obb_float32.tflite
+    - assets/labels.txt
+    - assets/fonts/
+    - assets/images/
+
+  uses-material-design: true
+  # Thêm fonts, assets, và các cài đặt khác cho Flutter tại đây
+  fonts:
+    - family: UTM_HelvetIns
+      fonts:
+               - asset: assets/fonts/Lexend-Bold.ttf
+               - asset: assets/fonts/Montserrat-Bold.ttf
+               - asset: assets/fonts/SF-Pro-Display-Bold.otf
+               - asset: assets/fonts/UTM_HelvetIns.ttf
+                 weight: 700
