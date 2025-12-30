@@ -128,7 +128,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 // Padding nhẹ để các góc không dính sát mép ảnh quá
                 padding: const EdgeInsets.all(2),
                 child: CustomPaint(
-                  painter: CornersPainter(color: Colors.),
+                  painter: CornersPainter(color: Colors.white70),
                 ),
               ),
             ),

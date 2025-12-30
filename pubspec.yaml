@@ -32,10 +32,10 @@ flutter:
 
   assets:
     # Khai báo tường minh file model và labels
-    - assets/yolo11l-obb_float32.tflite
-    - assets/yolo11l-obb_float16.tflite
-    - assets/yolo11m-obb_float32.tflite
+    #- assets/yolo11m-obb_float32.tflite
+    #- assets/yolo11m-obb_float16.tflite
     - assets/yolo11s-obb_float32.tflite
+    - assets/yolo11s-obb_float16.tflite
     - assets/labels.txt
     - assets/fonts/
     - assets/images/

@@ -115,9 +115,9 @@ class _CountingScreenState extends State<CountingScreen> {
     try {
       // Bước 5: Nạp File Model AI (.tflite) từ thư mục assets
       //await _countingService.loadModel('assets/yolo11l-obb_float16.tflite');
-      await _countingService.loadModel('assets/yolo11l-obb_float32.tflite');
+      //await _countingService.loadModel('assets/yolo11l-obb_float32.tflite');
       //await _countingService.loadModel('assets/yolo11m-obb_float32.tflite');
-      //await _countingService.loadModel('assets/yolo11s-obb_float32.tflite');
+      await _countingService.loadModel('assets/yolo11s-obb_float32.tflite');
 
       // Bước 6: Gọi hàm xử lý đếm vật thể (Trả về tọa độ xoay OBB)
       final results = await _countingService.countObjects(
