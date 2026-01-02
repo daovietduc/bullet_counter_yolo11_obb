@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+// Widget để chọn chế độ (mode) và hiển thị lựa chọn hiện tại.
 class ModeSelector extends StatelessWidget {
-  // Callback để truyền classID, modeName, modeImage tên chế độ ra cho widget cha
+  // Callback được gọi khi một chế độ mới được chọn.
   final Function(int classId, String modeName, String modeImage) onModeSelected;
-  final String currentModeName; // Tên của chế độ hiện tại để hiển thị trên nút
-  final String? currentModeImage; // Ảnh của chế độ hiện tại để hiển thị trên nút
+  // Tên chế độ đang được chọn.
+  final String currentModeName;
+  // Đường dẫn ảnh của chế độ đang được chọn.
+  final String? currentModeImage;
 
   const ModeSelector({
     super.key,
@@ -13,14 +16,14 @@ class ModeSelector extends StatelessWidget {
     this.currentModeImage,
   });
 
-  // Hàm để hiển thị Bottom Sheet
+  // Hiển thị bottom sheet để người dùng chọn chế độ.
   void _showModeSelectionSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        // Truyền hàm onModeSelected xuống cho cửa sổ con
+        // Truyền callback `onModeSelected` vào sheet.
         return _ModeSelectorSheetContent(
           onModeSelected: onModeSelected,
         );
@@ -30,7 +33,7 @@ class ModeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /// Nút chọn chế độ đếm
+    // Nút bấm để mở trang chọn chế độ.
     return InkWell(
       borderRadius: BorderRadius.circular(30),
       onTap: () => _showModeSelectionSheet(context),
@@ -39,7 +42,7 @@ class ModeSelector extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("Mode", style: const TextStyle(
+            const Text("Mode", style: TextStyle(
                 fontSize: 12,
                 color: Colors.white,
                 fontWeight: FontWeight.w600),),
@@ -49,8 +52,7 @@ class ModeSelector extends StatelessWidget {
               height: 40,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
-                child: _buildImageWidget(
-                    currentModeImage), // Dùng hàm build ảnh đã được đơn giản hóa
+                child: _buildImageWidget(currentModeImage),
               ),
             ),
             const SizedBox(height: 4),
@@ -68,10 +70,10 @@ class ModeSelector extends StatelessWidget {
     );
   }
 
-  // SỬA ĐỔI: Đơn giản hóa hàm này, chỉ xử lý ảnh asset hoặc icon mặc định
+  // Xây dựng widget hiển thị ảnh cho chế độ, hoặc icon mặc định nếu không có ảnh.
   Widget _buildImageWidget(String? imagePath) {
     if (imagePath != null && imagePath.isNotEmpty) {
-      // Nếu có đường dẫn ảnh, dùng Image.asset
+      // Hiển thị ảnh từ assets.
       return Image.asset(
         imagePath,
         fit: BoxFit.cover,
@@ -79,13 +81,13 @@ class ModeSelector extends StatelessWidget {
         const Icon(Icons.error_outline, color: Colors.white, size: 28),
       );
     } else {
-      // Nếu không có ảnh, hiển thị icon mặc định
+      // Hiển thị icon mặc định.
       return const Icon(Icons.category, color: Colors.white, size: 28);
     }
   }
 }
 
-/// Widget bottom sheet chứa chế độ đếm
+// Nội dung của bottom sheet, chứa danh sách các chế độ để lựa chọn.
 class _ModeSelectorSheetContent extends StatelessWidget {
   final Function(int classId, String modeName, String modeImage) onModeSelected;
 
@@ -93,16 +95,14 @@ class _ModeSelectorSheetContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Danh sách các chế độ có sẵn.
     final List<Map<String, dynamic>> modes = [
-      {"name": "K51", "image": "assets/images/k51.png", "classID": 0},
-      {"name": "K59", "image": "assets/images/k59.png", "classID": 1},
-      {"name": "K56", "image": "assets/images/k56.png", "classID": 2},
-      {"name": "K53", "image": "assets/images/k53.png", "classID": 9},
-      {"name": "12,7mm", "image": "assets/images/12,7.png", "classID": 10},
+      {"name": "K51", "image": "assets/images/K51.png", "classID": 0},
+      {"name": "K59", "image": "assets/images/K59.png", "classID": 1},
+      {"name": "K56", "image": "assets/images/K56.png", "classID": 2},
+      {"name": "K53", "image": "assets/images/K53.png", "classID": 3},
+      {"name": "12,7mm", "image": "assets/images/12,7.png", "classID": 4},
       {"name": "14,5mm", "image": "assets/images/14,5.png", "classID": 5},
-      {"name": "23mm", "image": "assets/images/k53.png", "classID": 9},
-      {"name": "37mm", "image": "assets/images/12,7.png", "classID": 10},
-      {"name": "57mm", "image": "assets/images/14,5.png", "classID": 5},
     ];
 
     return Container(
@@ -113,11 +113,13 @@ class _ModeSelectorSheetContent extends StatelessWidget {
       ),
       child: Column(
         children: [
+          // Tay cầm (handle) để người dùng biết có thể kéo sheet.
           Container(
               margin: const EdgeInsets.symmetric(vertical: 10),
               height: 4, width: 40,
               decoration: BoxDecoration(color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(10))),
+          // Thanh tiêu đề và nút đóng.
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -140,6 +142,7 @@ class _ModeSelectorSheetContent extends StatelessWidget {
                     ),
                   ])),
           const Divider(),
+          // Lưới hiển thị các chế độ.
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(12),
@@ -156,7 +159,9 @@ class _ModeSelectorSheetContent extends StatelessWidget {
                     final int selectedId = mode["classID"];
                     final String selectedName = mode["name"];
                     final String selectedImage = mode["image"];
+                    // Gọi callback để thông báo cho widget cha về lựa chọn mới.
                     onModeSelected(selectedId, selectedName, selectedImage);
+                    // Đóng bottom sheet.
                     Navigator.pop(context);
                   },
                   behavior: HitTestBehavior.opaque,
@@ -165,8 +170,8 @@ class _ModeSelectorSheetContent extends StatelessWidget {
                       Expanded(
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
+                          // Ngăn chặn các tương tác chạm vào ảnh.
                           child: IgnorePointer(
-                            // SỬA ĐỔI: Dùng trực tiếp Image.asset
                             child: Image.asset(mode["image"]!, fit: BoxFit.cover),
                           ),
                         ),

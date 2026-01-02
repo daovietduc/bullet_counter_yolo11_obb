@@ -1,109 +1,115 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// 1. LỚP DỮ LIỆU CHẾ ĐỘ ĐẾM (MODEL CLASS)
-/// Đại diện cho đối tượng vật thể mà người dùng chọn để AI nhận diện.
+/// Model: Lưu trữ thông tin về chế độ đếm đã chọn.
 class SelectedMode {
-  final int targetClass; // ID của lớp vật thể (Ví dụ: 0 cho Máy bay, 1 cho Tàu thuyền)
-  final String name;      // Tên hiển thị trên giao diện (Ví dụ: "Đếm Máy Bay")
-  final String image;     // Đường dẫn icon hoặc hình ảnh minh họa cho chế độ đó
+  final int targetClass;
+  final String name;
+  final String image;
 
   SelectedMode({required this.targetClass, required this.name, required this.image});
 }
 
-/// 2. LỚP TÙY CHỌN HIỂN THỊ (MODEL CLASS)
-/// Lưu trữ các cài đặt về việc bật/tắt các thành phần đồ họa trên màn hình kết quả.
+/// Model: Lưu trữ các tùy chọn hiển thị trên màn hình kết quả.
 class DisplayPreferences {
-  final bool showBoundingBoxes; // Có vẽ khung bao quanh vật thể hay không
-  final bool showConfidence;    // Có hiện chỉ số % tin cậy của AI hay không
-  final bool showFillBox;      // Có tô màu cho bounding box hay không
-  final bool showOrderNumber;    // Có hiển thị số thứ tự của bounding box hay không
+  final bool showBoundingBoxes;
+  final bool showConfidence;
+  final bool showFillBox;
+  final bool showOrderNumber;
+  final bool showMultiColor; // True: vẽ các box với nhiều màu. False: dùng một màu `boxColor`.
+  final Color boxColor;      // Màu sắc của box khi `showMultiColor` là false.
+  final double opacity;      // Độ trong suốt của box (từ 0.0 đến 1.0).
 
   DisplayPreferences({
     this.showBoundingBoxes = true,
     this.showConfidence = true,
     this.showFillBox = false,
     this.showOrderNumber = false,
+    this.showMultiColor = true,    // Mặc định bật chế độ đa màu.
+    this.boxColor = Colors.redAccent,
+    this.opacity = 1.0,
   });
 }
 
-/// 3. DỊCH VỤ QUẢN LÝ TÙY CHỌN (SERVICE CLASS)
-/// Sử dụng thư viện 'SharedPreferences' để lưu dữ liệu dưới dạng Key-Value vào bộ nhớ máy.
-/// Giúp ứng dụng "ghi nhớ" cài đặt của người dùng kể cả khi đã tắt app hoàn toàn.
+/// Service: Quản lý việc lưu và tải các tùy chọn của người dùng.
+/// Sử dụng SharedPreferences để lưu trữ dữ liệu cục bộ.
 class PreferencesService {
-  // Định nghĩa các "Khóa" (Keys) cố định để tránh sai sót khi truy xuất dữ liệu
+  // Khóa (key) cho SelectedMode
   static const String _selectedTargetClassKey = 'selectedTargetClass';
   static const String _selectedModeNameKey = 'selectedModeName';
   static const String _selectedModeImageKey = 'selectedModeImage';
+
+  // Khóa cho DisplayPreferences
   static const String _showBoundingBoxesKey = 'showBoundingBoxes';
   static const String _showConfidenceKey = 'showConfidence';
   static const String _showFillBoxKey = 'showFillBox';
   static const String _showOrderNumberKey = 'showOrderNumber';
+  static const String _showMultiColorKey = 'showMultiColor';
+  static const String _boxColorKey = 'boxColor';
+  static const String _opacityKey = 'boxOpacity';
 
-  // --------------------------------------------------------------------------
-  // QUẢN LÝ CHẾ ĐỘ ĐẾM (SELECTED MODE)
-  // --------------------------------------------------------------------------
+  // --- Quản lý Chế độ đếm (SelectedMode) ---
 
-  /// Ghi dữ liệu chế độ đếm xuống bộ nhớ điện thoại
+  /// Lưu đối tượng `SelectedMode` vào SharedPreferences.
   Future<void> saveSelectedMode(SelectedMode mode) async {
     final prefs = await SharedPreferences.getInstance();
-    // SharedPreferences chỉ lưu được kiểu dữ liệu cơ bản (int, String, bool)
-    // nên ta cần bóc tách đối tượng SelectedMode ra từng phần để lưu.
     await prefs.setInt(_selectedTargetClassKey, mode.targetClass);
     await prefs.setString(_selectedModeNameKey, mode.name);
     await prefs.setString(_selectedModeImageKey, mode.image);
   }
 
-  /// Đọc chế độ đếm đã lưu từ lần sử dụng trước
+  /// Tải `SelectedMode` từ SharedPreferences.
+  /// Trả về `null` nếu không tìm thấy dữ liệu.
   Future<SelectedMode?> loadSelectedMode() async {
     final prefs = await SharedPreferences.getInstance();
-
-    // Kiểm tra xem đã từng có dữ liệu được lưu hay chưa dựa trên khóa TargetClass
     if (prefs.containsKey(_selectedTargetClassKey)) {
       final targetClass = prefs.getInt(_selectedTargetClassKey);
-      // Sử dụng toán tử ?? để gán giá trị mặc định nếu dữ liệu trả về bị null (Null-safety)
       final name = prefs.getString(_selectedModeNameKey) ?? 'Mode';
       final image = prefs.getString(_selectedModeImageKey) ?? '';
 
-      if(targetClass != null){
+      if (targetClass != null) {
         return SelectedMode(targetClass: targetClass, name: name, image: image);
       }
     }
-    return null; // Trả về null nếu đây là lần đầu tiên mở app và chưa chọn chế độ nào
+    return null;
   }
 
-  // --------------------------------------------------------------------------
-  // QUẢN LÝ TÙY CHỌN HIỂN THỊ (DISPLAY SETTINGS)
-  // --------------------------------------------------------------------------
+  // --- Quản lý Tùy chọn hiển thị (DisplayPreferences) ---
 
-  /// Lưu trạng thái Bật/Tắt của Bounding Box và Confidence
-  Future<void> saveDisplayPreferences({
-    required bool showBoundingBoxes,
-    required bool showConfidence,
-    required bool showFillBox,
-    required bool showOrderNumber,
-  }) async {
+  /// Lưu đối tượng `DisplayPreferences` vào SharedPreferences.
+  Future<void> saveDisplayPreferences(DisplayPreferences prefsData) async {
     final instance = await SharedPreferences.getInstance();
-    await instance.setBool(_showBoundingBoxesKey, showBoundingBoxes);
-    await instance.setBool(_showConfidenceKey, showConfidence);
-    await instance.setBool(_showFillBoxKey, showFillBox);
-    await instance.setBool(_showOrderNumberKey, showOrderNumber);
+    await instance.setBool(_showBoundingBoxesKey, prefsData.showBoundingBoxes);
+    await instance.setBool(_showConfidenceKey, prefsData.showConfidence);
+    await instance.setBool(_showFillBoxKey, prefsData.showFillBox);
+    await instance.setBool(_showOrderNumberKey, prefsData.showOrderNumber);
+    await instance.setBool(_showMultiColorKey, prefsData.showMultiColor);
+    await instance.setInt(_boxColorKey, prefsData.boxColor.value);
+    await instance.setDouble(_opacityKey, prefsData.opacity);
   }
 
-  /// Tải các cài đặt hiển thị
+  /// Tải `DisplayPreferences` từ SharedPreferences.
+  /// Sử dụng giá trị mặc định nếu không tìm thấy dữ liệu đã lưu.
   Future<DisplayPreferences> loadDisplayPreferences() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Nếu người dùng chưa bao giờ cài đặt, mặc định sẽ hiển thị cả hai (true)
     final showBoxes = prefs.getBool(_showBoundingBoxesKey) ?? true;
     final showConfidence = prefs.getBool(_showConfidenceKey) ?? true;
     final showFillBox = prefs.getBool(_showFillBoxKey) ?? false;
     final showOrderNumber = prefs.getBool(_showOrderNumberKey) ?? false;
+    final showMultiColor = prefs.getBool(_showMultiColorKey) ?? true;
+
+    final colorValue = prefs.getInt(_boxColorKey) ?? Colors.redAccent.value;
+    final opacity = prefs.getDouble(_opacityKey) ?? 1.0;
 
     return DisplayPreferences(
       showBoundingBoxes: showBoxes,
       showConfidence: showConfidence,
       showFillBox: showFillBox,
       showOrderNumber: showOrderNumber,
+      showMultiColor: showMultiColor,
+      boxColor: Color(colorValue),
+      opacity: opacity,
     );
   }
 }
