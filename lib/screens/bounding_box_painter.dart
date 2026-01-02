@@ -65,6 +65,15 @@ class BoundingBoxPainter extends CustomPainter {
         );
       }).toList();
 
+      // Tính toán kích thước cạnh ngắn hơn của vật thể để điều chỉnh độ dày động
+      final double side1 = (scaledVertices[1] - scaledVertices[0]).distance;
+      final double side2 = (scaledVertices[2] - scaledVertices[1]).distance;
+      final double smallerSide = min(side1, side2);
+
+      // --- LOGIC ĐỘ DÀY ĐỘNG ---
+      // Độ dày viền tỷ lệ với kích thước vật thể (khoảng 3% cạnh ngắn), giới hạn từ 0.5 đến 3.0
+      final double dynamicStrokeWidth = (smallerSide * 0.03).clamp(0.5, 3.0);
+
       // Tạo Path (Đường dẫn nối các điểm)
       final path = Path();
       path.moveTo(scaledVertices[0].dx, scaledVertices[0].dy);
@@ -79,7 +88,7 @@ class BoundingBoxPainter extends CustomPainter {
       if (showFillBox) {
         final fillPaint = Paint()
           ..style = PaintingStyle.fill
-          ..color = baseColor.withOpacity(0.6); // Độ trong suốt 20% để nhìn thấy ảnh nền
+          ..color = baseColor.withOpacity(0.3); // Giảm độ mờ xuống 30% để dễ quan sát vật nhỏ
 
         canvas.drawPath(path, fillPaint);
       }
@@ -90,7 +99,7 @@ class BoundingBoxPainter extends CustomPainter {
       if (showBoundingBoxes) {
         final borderPaint = Paint()
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.0 // Tăng độ dày một chút cho rõ
+          ..strokeWidth = dynamicStrokeWidth // Sử dụng độ dày động
           ..color = baseColor
           ..strokeJoin = StrokeJoin.round
           ..strokeCap = StrokeCap.round;
@@ -102,12 +111,15 @@ class BoundingBoxPainter extends CustomPainter {
       // 4. VẼ NHÃN (LABEL)
       // ========================================================================
       if (showConfidence) {
+        // Cỡ chữ động dựa trên vật thể để tránh chữ to đè hết khung
+        final double dynamicFontSize = (smallerSide * 0.15).clamp(7.0, 12.0);
+
         final textPainter = TextPainter(
           text: TextSpan(
             text: '${(result.confidence * 100).toStringAsFixed(0)}%',
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 11, // Tăng nhẹ kích thước chữ
+              fontSize: dynamicFontSize,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -118,19 +130,20 @@ class BoundingBoxPainter extends CustomPainter {
         // Đặt nhãn tại đỉnh đầu tiên
         final labelPos = scaledVertices[0];
 
-        // Vẽ nền cho nhãn
+        // Vẽ nền cho nhãn (Kích thước nền cũng co giãn theo chữ)
+        final double padding = dynamicFontSize * 0.3;
         final RRect labelBackground = RRect.fromRectAndRadius(
           Rect.fromLTRB(
               labelPos.dx,
-              labelPos.dy - textPainter.height - 4,
-              labelPos.dx + textPainter.width + 8,
+              labelPos.dy - textPainter.height - padding,
+              labelPos.dx + textPainter.width + (padding * 2),
               labelPos.dy
           ),
-          const Radius.circular(4),
+          Radius.circular(padding),
         );
 
         canvas.drawRRect(labelBackground, Paint()..color = baseColor.withOpacity(0.9));
-        textPainter.paint(canvas, Offset(labelPos.dx + 4, labelPos.dy - textPainter.height - 2));
+        textPainter.paint(canvas, Offset(labelPos.dx + padding, labelPos.dy - textPainter.height - (padding/2)));
       }
 
       // ========================================================================
@@ -147,29 +160,23 @@ class BoundingBoxPainter extends CustomPainter {
         centerX /= scaledVertices.length;
         centerY /= scaledVertices.length;
 
-        // Tính toán kích thước cạnh ngắn hơn của vật thể để điều chỉnh kích thước số thứ tự.
-        // Giả sử các đỉnh được trả về theo thứ tự.
-        final double side1 = (scaledVertices[1] - scaledVertices[0]).distance;
-        final double side2 = (scaledVertices[2] - scaledVertices[1]).distance;
-        final double smallerSide = min(side1, side2);
-
         // Kích thước của vòng tròn và font chữ sẽ co dãn theo kích thước vật thể
-        final double circleRadius = min(smallerSide * 0.40, 18.0);
-        final double fontSize = min(circleRadius * 0.9, 16.0); // Font chữ nhỏ hơn bán kính một chút
-        final double strokeWidth = min(circleRadius * 0.12, 2.0);
+        final double circleRadius = min(smallerSide * 0.35, 15.0);
+        final double fontSize = circleRadius * 1.1;
+        final double strokeWidth = (circleRadius * 0.1).clamp(0.5, 2.0);
 
         // Vẽ hình tròn
         canvas.drawCircle(
-            Offset(centerX, centerY),
-            circleRadius,
-            Paint()..color = Colors.white.withOpacity(0.6), // Màu nền trong suốt
+          Offset(centerX, centerY),
+          circleRadius,
+          Paint()..color = Colors.white.withOpacity(0.7), // Tăng nhẹ độ hiển thị
         );
 
         // Vẽ viền cho hình tròn
         canvas.drawCircle(
             Offset(centerX, centerY),
             circleRadius,
-            Paint()..style = PaintingStyle.stroke..color = Colors.red..strokeWidth = strokeWidth
+            Paint()..style = PaintingStyle.stroke..color = baseColor..strokeWidth = strokeWidth
         );
 
         // Vẽ số thứ tự
