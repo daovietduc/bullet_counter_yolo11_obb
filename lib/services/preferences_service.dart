@@ -25,9 +25,9 @@ class DisplayPreferences {
     this.showConfidence = true,
     this.showFillBox = false,
     this.showOrderNumber = false,
-    this.showMultiColor = true,    // Mặc định bật chế độ đa màu.
+    this.showMultiColor = true,
     this.boxColor = Colors.redAccent,
-    this.opacity = 1.0,
+    this.opacity = 64,
   });
 }
 

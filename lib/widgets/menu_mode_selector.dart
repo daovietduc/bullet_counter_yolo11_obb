@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 
-// Widget để chọn chế độ (mode) và hiển thị lựa chọn hiện tại.
 class ModeSelector extends StatelessWidget {
-  // Callback được gọi khi một chế độ mới được chọn.
   final Function(int classId, String modeName, String modeImage) onModeSelected;
-  // Tên chế độ đang được chọn.
   final String currentModeName;
-  // Đường dẫn ảnh của chế độ đang được chọn.
   final String? currentModeImage;
 
   const ModeSelector({
@@ -16,16 +12,15 @@ class ModeSelector extends StatelessWidget {
     this.currentModeImage,
   });
 
-  // Hiển thị bottom sheet để người dùng chọn chế độ.
   void _showModeSelectionSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        // Truyền callback `onModeSelected` vào sheet.
         return _ModeSelectorSheetContent(
           onModeSelected: onModeSelected,
+          currentModeName: currentModeName,
         );
       },
     );
@@ -33,69 +28,54 @@ class ModeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Nút bấm để mở trang chọn chế độ.
     return InkWell(
-      borderRadius: BorderRadius.circular(30),
       onTap: () => _showModeSelectionSheet(context),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text("Mode", style: TextStyle(
-                fontSize: 12,
-                color: Colors.white,
-                fontWeight: FontWeight.w600),),
-            const SizedBox(height: 4),
-            SizedBox(
-              width: 40,
-              height: 40,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: _buildImageWidget(currentModeImage),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              currentModeName,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        height: 50,
+        width: 50,
+        decoration: BoxDecoration(
+          // Cập nhật: Sử dụng withValues thay cho withOpacity
+          color: Colors.white.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.24),
+            width: 1.5,
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: _buildImageWidget(currentModeImage),
         ),
       ),
     );
   }
 
-  // Xây dựng widget hiển thị ảnh cho chế độ, hoặc icon mặc định nếu không có ảnh.
   Widget _buildImageWidget(String? imagePath) {
     if (imagePath != null && imagePath.isNotEmpty) {
-      // Hiển thị ảnh từ assets.
       return Image.asset(
         imagePath,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) =>
-        const Icon(Icons.error_outline, color: Colors.white, size: 28),
+        const Icon(Icons.broken_image, color: Colors.white, size: 24),
       );
     } else {
-      // Hiển thị icon mặc định.
-      return const Icon(Icons.category, color: Colors.white, size: 28);
+      return const Icon(Icons.category, color: Colors.white, size: 24);
     }
   }
 }
 
-// Nội dung của bottom sheet, chứa danh sách các chế độ để lựa chọn.
 class _ModeSelectorSheetContent extends StatelessWidget {
   final Function(int classId, String modeName, String modeImage) onModeSelected;
+  final String currentModeName;
 
-  const _ModeSelectorSheetContent({required this.onModeSelected});
+  const _ModeSelectorSheetContent({
+    required this.onModeSelected,
+    required this.currentModeName,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Danh sách các chế độ có sẵn.
     final List<Map<String, dynamic>> modes = [
       {"name": "K51", "image": "assets/images/K51.png", "classID": 0},
       {"name": "K59", "image": "assets/images/K59.png", "classID": 1},
@@ -106,88 +86,109 @@ class _ModeSelectorSheetContent extends StatelessWidget {
     ];
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: Color(0xFFF5F5F7),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Tay cầm (handle) để người dùng biết có thể kéo sheet.
+          // 1. Khoảng cách trên cùng
+          const SizedBox(height: 12),
           Container(
-              margin: const EdgeInsets.symmetric(vertical: 10),
-              height: 4, width: 40,
-              decoration: BoxDecoration(color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(10))),
-          // Thanh tiêu đề và nút đóng.
-          Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    const Text("Bullet", style: TextStyle(fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,)),
-                    const Text("Phụ tùng", style: TextStyle(fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,)),
-                    const Text("Chi tiết", style: TextStyle(fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,)),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.grey),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+            height: 5,
+            width: 45,
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          // 2. Khoảng cách giữa handle và tiêu đề
+          const SizedBox(height: 16),
+          const Text(
+            "Select Bullet Type",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          // 3. Khoảng cách giữa tiêu đề và lưới
+          const SizedBox(height: 24),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.only(bottom: 30),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 15,
+              mainAxisSpacing: 15,
+              childAspectRatio: 0.85,
+            ),
+            itemCount: modes.length,
+            itemBuilder: (context, index) {
+              final mode = modes[index];
+              final bool isSelected = currentModeName == mode["name"];
+
+              return InkWell(
+                onTap: () {
+                  onModeSelected(mode["classID"], mode["name"], mode["image"]);
+                  Navigator.pop(context);
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isSelected ? Colors.blueAccent : Colors.transparent,
+                      width: 2.5,
                     ),
-                  ])),
-          const Divider(),
-          // Lưới hiển thị các chế độ.
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(12),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 0.8),
-              itemCount: modes.length,
-              itemBuilder: (context, index) {
-                final mode = modes[index];
-                return GestureDetector(
-                  onTap: () {
-                    final int selectedId = mode["classID"];
-                    final String selectedName = mode["name"];
-                    final String selectedImage = mode["image"];
-                    // Gọi callback để thông báo cho widget cha về lựa chọn mới.
-                    onModeSelected(selectedId, selectedName, selectedImage);
-                    // Đóng bottom sheet.
-                    Navigator.pop(context);
-                  },
-                  behavior: HitTestBehavior.opaque,
+                    boxShadow: [
+                      BoxShadow(
+                        // Cập nhật: withValues cho shadow
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          // Ngăn chặn các tương tác chạm vào ảnh.
-                          child: IgnorePointer(
-                            child: Image.asset(mode["image"]!, fit: BoxFit.cover),
+                        child: Container(
+                          margin: const EdgeInsets.all(10),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              mode["image"],
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
                       ),
+                      // Khoảng cách giữa ảnh và text
                       const SizedBox(height: 4),
-                      Text(mode["name"]!, textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12, left: 4, right: 4),
+                        child: Text(
+                          mode["name"],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                            color: isSelected ? Colors.blueAccent : Colors.black54,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ],
       ),

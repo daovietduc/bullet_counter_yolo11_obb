@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'dart:async';
 
 import '../services/camera_service.dart';
-import '../widgets/bottom_toolbar.dart';
+import '../widgets/camera_bottom_toolbar.dart';
 import '../helpers/ui_helpers.dart';
 
 /// Màn hình camera chính để xem preview và chụp ảnh.
@@ -73,7 +73,7 @@ class _CameraScreenState extends State<CameraScreen> {
         title: const Text(
           'BULLET COUNTER',
           style: TextStyle(
-            color: Colors.amber,
+            color: Colors.white70,
             fontFamily: 'UTM_Helvet',
             fontWeight: FontWeight.bold,
             fontSize: 24,
@@ -112,7 +112,7 @@ class _CameraScreenState extends State<CameraScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(2),
                 child: CustomPaint(
-                  painter: CornersPainter(color: Colors.white70),
+                  painter: CornersPainter(color: Colors.amber),
                 ),
               ),
             ),

@@ -33,7 +33,7 @@ class DisplayOptionsDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      width: MediaQuery.of(context).size.width * 0.7,
+      width: MediaQuery.of(context).size.width * 0.75,
       backgroundColor: const Color(0xFFF2F2F7), // Màu nền xám nhạt (kiểu iOS)
       child: Column(
         children: [
@@ -133,8 +133,9 @@ class DisplayOptionsDrawer extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
-            'Tùy chọn',
-            style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+            'Display options',
+            style: TextStyle(
+                color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
           ),
           IconButton(
             icon: const Icon(Icons.close, color: Colors.black54),
@@ -168,7 +169,7 @@ class DisplayOptionsDrawer extends StatelessWidget {
       title: Text(label, style: const TextStyle(color: Colors.black, fontSize: 16)),
       trailing: CupertinoSwitch(
         value: value,
-        activeColor: CupertinoColors.activeGreen,
+        activeTrackColor: CupertinoColors.activeGreen,
         onChanged: onChanged,
       ),
     );
@@ -218,7 +219,8 @@ class DisplayOptionsDrawer extends StatelessWidget {
   /// Hiển thị hộp thoại (Action Sheet) để chọn màu.
   void _showColorPickerDialog(BuildContext context) {
     // Danh sách các màu có sẵn để chọn
-    final List<Map<String, dynamic>> colorOptions = [
+    // Chuyển thành static const để không phải tạo lại mỗi lần hàm được gọi
+    const List<Map<String, dynamic>> colorOptions = [
       {'name': 'Đỏ', 'color': Colors.red},
       {'name': 'Xanh lá', 'color': Colors.green},
       {'name': 'Xanh dương', 'color': Colors.blue},
@@ -249,12 +251,13 @@ class DisplayOptionsDrawer extends StatelessWidget {
   /// Hiển thị hộp thoại (Action Sheet) để chọn độ trong suốt.
   void _showOpacityPickerDialog(BuildContext context) {
     // Danh sách các mức độ trong suốt có sẵn
-    final List<Map<String, dynamic>> opacityOptions = [
-      {'label': 'Trong suốt (0%)', 'value': 0.0},
-      {'label': 'Mờ nhẹ (25%)', 'value': 0.25},
-      {'label': 'Mờ vừa (50%)', 'value': 0.5},
-      {'label': 'Mờ cao (75%)', 'value': 0.75},
-      {'label': 'Đặc (100%)', 'value': 1.0}, // Sửa "Mờ đục" thành "Đặc" cho rõ nghĩa hơn
+    // Chuyển thành static const để không phải tạo lại mỗi lần hàm được gọi
+    const List<Map<String, dynamic>> opacityOptions = [
+      {'label': 'Trong suốt (0%)', 'value': 0},
+      {'label': 'Mờ nhẹ (25%)', 'value': 64},
+      {'label': 'Mờ vừa (50%)', 'value': 128},
+      {'label': 'Mờ cao (75%)', 'value': 192},
+      {'label': 'Màu đặc (100%)', 'value': 255},
     ];
 
     showCupertinoModalPopup(

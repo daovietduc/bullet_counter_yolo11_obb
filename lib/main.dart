@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:provider/provider.dart';
+import '../utils/logger.dart';
 
 // Import các file nội bộ trong dự án
 import '../services/camera_service.dart';
@@ -13,19 +14,22 @@ void main() async {
   // trước khi chạy các lệnh tiếp theo.
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 2. Gọi hệ thống để lấy danh sách các ống kính camera hiện có trên điện thoại (Trước, sau, macro...)
+  // 2. Quan trọng: Cấu hình logging trước khi chạy ứng dụng
+  setupLogging();
+
+  // 3. Gọi hệ thống để lấy danh sách các ống kính camera hiện có trên điện thoại (Trước, sau, macro...)
   final cameras = await availableCameras();
 
   // Biến lưu trữ camera mà ứng dụng sẽ sử dụng
   CameraDescription? selectedCamera;
 
-  // 3. Kiểm tra xem thiết bị có camera không (Đề phòng trường hợp máy hỏng camera hoặc máy ảo)
+  // 4. Kiểm tra xem thiết bị có camera không (Đề phòng trường hợp máy hỏng camera hoặc máy ảo)
   if (cameras.isNotEmpty) {
     // Ưu tiên chọn camera đầu tiên trong danh sách (Thường là camera sau)
     selectedCamera = cameras.first;
   }
 
-  // 4. Khởi chạy ứng dụng
+  // 5. Khởi chạy ứng dụng
   runApp(
     // Sử dụng Provider để "phát tín hiệu" CameraService ra toàn bộ ứng dụng.
     // Việc này giúp bất kỳ màn hình nào cũng có thể gọi các hàm điều khiển camera.

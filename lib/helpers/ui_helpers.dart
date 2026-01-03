@@ -39,7 +39,7 @@ class UIHelper {
                     filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                     child: Container(
                       // Thêm một lớp phủ màu đen mờ để làm nổi bật văn bản.
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withAlpha(51),
                     ),
                   ),
                 ),

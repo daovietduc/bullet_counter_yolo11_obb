@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:ui';
 import 'dart:math';
 import 'package:flutter/services.dart';
+import 'package:logging/logging.dart';
 import 'package:image/image.dart' as img; // Thư viện xử lý pixel: dùng để resize và chuẩn hóa ảnh
 import 'package:tflite_flutter/tflite_flutter.dart'; // Thư viện cầu nối chạy AI TensorFlow Lite
 import '../models/detection_result.dart'; // Model chứa kết quả: đỉnh xoay, độ tự tin, class...
@@ -31,6 +31,7 @@ import '../models/detection_result.dart'; // Model chứa kết quả: đỉnh x
 class CountingService {
   Interpreter? _interpreter; // Bộ máy thực thi mô hình AI
   List<String> _labels = []; // Danh sách tên nhãn đọc từ file labels.txt
+  final _log = Logger('CountingServide'); // Tạo đối tượng lưu log
 
   // --- BIẾN PHỤ TRỢ CHO LETTERBOXING (MỚI THÊM) ---
   double _scale = 1.0; // Tỷ lệ phóng đại chung để không méo hình
@@ -58,10 +59,10 @@ class CountingService {
       // Đọc file nhãn và chuyển thành danh sách mảng (xử lý xuống dòng)
       final labelsData = await rootBundle.loadString(labelsPath);
       _labels = labelsData.split('\n').map((l) => l.trim()).where((l) => l.isNotEmpty).toList();
-      print('--- [AI] Model OBB Loaded Successfully ---');
-    } catch (e) {
-      print('--- [ERROR] Lỗi nạp mô hình: $e ---');
-      rethrow;
+      _log.info("Model and labels loaded successfully. Found ${_labels.length} labels.");
+    } catch (e, stackTrace) {
+      _log.severe('Failed to load the model', e, stackTrace);
+      rethrow; // Ném lại lỗi để lớp gọi có thể xử lý (ví dụ: hiển thị thông báo cho người dùng)
     }
   }
 

@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import '../models/detection_result.dart';
 
 /// LỚP VẼ ĐÈ (OVERLAY): Chịu trách nhiệm "ánh xạ" tọa độ từ ảnh gốc lên màn hình
@@ -132,7 +131,7 @@ class BoundingBoxPainter extends CustomPainter {
           Radius.circular(padding),
         );
 
-        canvas.drawRRect(labelBackground, Paint()..color = baseColor.withOpacity(0.9));
+        canvas.drawRRect(labelBackground, Paint()..color = baseColor.withAlpha(230));
         // Vẽ chữ lên trên nền
         textPainter.paint(canvas, Offset(labelPos.dx + padding, labelPos.dy - textPainter.height - (padding/2)));
       }
@@ -156,7 +155,7 @@ class BoundingBoxPainter extends CustomPainter {
         canvas.drawCircle(
           Offset(centerX, centerY),
           circleRadius,
-          Paint()..color = baseColor.withOpacity(0.85),
+          Paint()..color = baseColor.withAlpha(200),
         );
 
         // Vẽ số thứ tự (index + 1)

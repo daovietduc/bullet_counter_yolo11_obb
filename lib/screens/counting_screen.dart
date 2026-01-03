@@ -202,25 +202,51 @@ class _CountingScreenState extends State<CountingScreen> {
               onPressed: () => Navigator.pop(context),
             ),
             // Tiêu đề hiển thị tổng số đối tượng đếm được.
-            title: RichText(
-              text: TextSpan(
-                children: [
-                  const TextSpan(
-                      text: 'Target: ',
-                      style: TextStyle(
-                          fontFamily: 'Lexend',
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold)),
-                  TextSpan(
-                      text: '$totalCount', // Số lượng đếm được
-                      style: const TextStyle(
-                          fontFamily: 'Lexend',
-                          color: Colors.orangeAccent,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
+            title: Column(
+              children: [
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      const TextSpan(
+                          text: 'Target: ',
+                          style: TextStyle(
+                              fontFamily: 'Lexend',
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold)),
+                      TextSpan(
+                          text: '$totalCount', // Số lượng đếm được
+                          style: const TextStyle(
+                              fontFamily: 'Lexend',
+                              color: Colors.orangeAccent,
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 5),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      const TextSpan(
+                          text: '(Mode: ',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,)),
+                      TextSpan(
+                        text: _selectedMode?.name ?? 'Chưa chọn',
+                          style: const TextStyle(
+                              color: Colors.deepOrange,
+                              fontSize: 14,)),
+                      const TextSpan(
+                        text: ')', // Dấu ngoặc đơn đóng ở cuối
+                        style: TextStyle(
+                          color: Colors.white, // Cùng style với chữ '(Mode: '
+                          fontSize: 14,)),
+                    ],
+                  ),
+                ),
+              ]
             ),
             actions: [
               // Nút mở Drawer (menu cài đặt trượt ra từ bên phải).
