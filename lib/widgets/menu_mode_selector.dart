@@ -32,8 +32,8 @@ class ModeSelector extends StatelessWidget {
       onTap: () => _showModeSelectionSheet(context),
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        height: 50,
-        width: 50,
+        height: 45,
+        width: 45,
         decoration: BoxDecoration(
           // Cập nhật: Sử dụng withValues thay cho withOpacity
           color: Colors.white.withValues(alpha: 0.1),

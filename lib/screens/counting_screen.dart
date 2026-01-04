@@ -193,71 +193,78 @@ class _CountingScreenState extends State<CountingScreen> {
         controller: _screenshotController, // Bọc toàn bộ Scaffold để có thể chụp lại màn hình.
         child: Scaffold(
           backgroundColor: Colors.black,
-          appBar: AppBar(
-            centerTitle: true,
-            backgroundColor: Colors.black,
-            // Nút 'X' để đóng màn hình hiện tại và quay về màn hình trước.
-            leading: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
-            ),
-            // Tiêu đề hiển thị tổng số đối tượng đếm được.
-            title: Column(
-              children: [
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      const TextSpan(
-                          text: 'Target: ',
-                          style: TextStyle(
-                              fontFamily: 'Lexend',
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold)),
-                      TextSpan(
-                          text: '$totalCount', // Số lượng đếm được
-                          style: const TextStyle(
-                              fontFamily: 'Lexend',
-                              color: Colors.orangeAccent,
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 5),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      const TextSpan(
-                          text: '(Mode: ',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,)),
-                      TextSpan(
-                        text: _selectedMode?.name ?? 'Chưa chọn',
-                          style: const TextStyle(
-                              color: Colors.deepOrange,
-                              fontSize: 14,)),
-                      const TextSpan(
-                        text: ')', // Dấu ngoặc đơn đóng ở cuối
-                        style: TextStyle(
-                          color: Colors.white, // Cùng style với chữ '(Mode: '
-                          fontSize: 14,)),
-                    ],
-                  ),
-                ),
-              ]
-            ),
-            actions: [
-              // Nút mở Drawer (menu cài đặt trượt ra từ bên phải).
-              Builder(
-                builder: (context) => IconButton(
-                  icon: const Icon(Icons.tune, color: Colors.white),
-                  tooltip: 'Cài đặt hiển thị',
-                  onPressed: () => Scaffold.of(context).openEndDrawer(),
-                ),
+          appBar: PreferredSize(
+            // B1: Đặt chiều cao mong muốn cho toàn bộ khu vực AppBar
+            preferredSize: const Size.fromHeight(70.0), // Ví dụ: 100 pixels
+            // B2: Đặt AppBar của bạn vào làm child
+            child: AppBar(
+              centerTitle: true,
+              backgroundColor: Colors.black,
+              // Nút 'X' để đóng màn hình hiện tại và quay về màn hình trước.
+              leading: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
               ),
-            ],
+              // Tiêu đề hiển thị tổng số đối tượng đếm được.
+              title: Column(
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                              text: 'Target: ',
+                              style: TextStyle(
+                                  fontFamily: 'Lexend',
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold)),
+                          TextSpan(
+                              text: '$totalCount', // Số lượng đếm được
+                              style: const TextStyle(
+                                  fontFamily: 'Lexend',
+                                  color: Colors.orangeAccent,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                              text: '(Mode: ',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,)),
+                          TextSpan(
+                              text: _selectedMode?.name ?? 'Chưa chọn',
+                              style: const TextStyle(
+                                color: Colors.deepOrange,
+                                fontSize: 14,)),
+                          const TextSpan(
+                              text: ')', // Dấu ngoặc đơn đóng ở cuối
+                              style: TextStyle(
+                                color: Colors.white,
+                                // Cùng style với chữ '(Mode: '
+                                fontSize: 14,)),
+                        ],
+                      ),
+                    ),
+                  ]
+              ),
+              actions: [
+                // Nút mở Drawer (menu cài đặt trượt ra từ bên phải).
+                Builder(
+                  builder: (context) =>
+                      IconButton(
+                        icon: const Icon(Icons.tune, color: Colors.white),
+                        tooltip: 'Cài đặt hiển thị',
+                        onPressed: () => Scaffold.of(context).openEndDrawer(),
+                      ),
+                ),
+              ],
+            ),
           ),
 
           // Drawer: Thanh cài đặt trượt ra từ bên phải.
@@ -299,48 +306,56 @@ class _CountingScreenState extends State<CountingScreen> {
           ),
 
           // Body: Khu vực trung tâm hiển thị ảnh và kết quả.
-          body: Center(
-            child: _originalImage == null
-            // Nếu ảnh chưa được tải, hiển thị vòng quay chờ.
-                ? const CircularProgressIndicator(color: Colors.amber)
-            // Nếu ảnh đã tải, sử dụng LayoutBuilder để lấy kích thước của không gian hiển thị.
-                : LayoutBuilder(
-              builder: (context, constraints) {
-                // Lấy kích thước thực của ảnh gốc.
-                double imgW = _originalImage!.width.toDouble();
-                double imgH = _originalImage!.height.toDouble();
-                double ratio = imgW / imgH; // Tính tỷ lệ khung hình.
+          body: _originalImage == null
+              ? const Center(
+              child: CircularProgressIndicator(color: Colors.amber))
+              : LayoutBuilder(
+            builder: (context, constraints) {
+              // 1. Lấy kích thước thật của ảnh
+              double imgW = _originalImage!.width.toDouble();
+              double imgH = _originalImage!.height.toDouble();
+              double ratio = imgW / imgH;
 
-                return InteractiveViewer(
-                  clipBehavior: Clip.none, // Cho phép nội dung tràn ra ngoài khi zoom.
-                  minScale: 1.0,           // Tỷ lệ zoom nhỏ nhất.
-                  maxScale: 5.0,           // Tỷ lệ zoom lớn nhất.
-                  child: AspectRatio(
-                    aspectRatio: ratio, // Giữ đúng tỷ lệ khung hình của ảnh.
+              // 2. Tính toán displayWidth và displayHeight để ảnh nằm gọn trong màn hình
+              double displayWidth = constraints.maxWidth;
+              double displayHeight = constraints.maxWidth / ratio;
+
+              // Trường hợp ảnh quá cao so với màn hình
+              if (displayHeight > constraints.maxHeight) {
+                displayHeight = constraints.maxHeight;
+                displayWidth = displayHeight * ratio;
+              }
+
+              return InteractiveViewer(
+                clipBehavior: Clip.none,
+                minScale: 1.0,
+                maxScale: 5.0,
+                child: Container( // Sử dụng Container bao toàn bộ vùng body
+                  width: constraints.maxWidth,
+                  height: constraints.maxHeight,
+                  alignment: Alignment.center, // Căn giữa nội dung bên trong
+                  child: SizedBox(
+                    width: displayWidth,
+                    height: displayHeight,
                     child: Stack(
                       children: [
-                        // Lớp 1: Hiển thị ảnh gốc.
-                        Image.file(File(widget.imagePath), fit: BoxFit.fill),
-                        // Lớp 2: Viền trang trí màu vàng xung quanh ảnh.
+                        // Lớp 1: Hiển thị ảnh (Khôi phục Image.file của bạn)
                         Positioned.fill(
-                          child: IgnorePointer( // Bỏ qua các tương tác chạm.
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.amber, width: 2),
-                              ),
-                            ),
+                          child: Image.file(
+                            File(widget.imagePath),
+                            fit: BoxFit.fill,
                           ),
                         ),
-                        // Lớp 3: Vẽ các hộp bao (bounding box) nếu có kết quả.
+
+                        // Lớp 2: Vẽ bounding box (Đảm bảo Painter nhận đúng kích thước)
                         if (_detectionResults.isNotEmpty)
                           Positioned.fill(
                             child: CustomPaint(
-                              // Sử dụng CustomPainter để vẽ trực tiếp lên canvas.
                               painter: BoundingBoxPainter(
                                 results: _detectionResults,
                                 originalImageSize: Size(imgW, imgH),
-                                screenImageSize: Size(constraints.maxWidth, constraints.maxWidth / ratio),
-                                // Truyền các tùy chọn hiển thị vào painter.
+                                screenImageSize: Size(
+                                    displayWidth, displayHeight),
                                 showBoundingBoxes: _showBoundingBoxes,
                                 showConfidence: _showConfidence,
                                 showFillBox: _showFillBox,
@@ -351,57 +366,99 @@ class _CountingScreenState extends State<CountingScreen> {
                               ),
                             ),
                           ),
+
+                        // Lớp 3: Viền (Khôi phục lớp viền Amber của bạn)
+                        Positioned.fill(
+                          child: IgnorePointer(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Colors.amber, width: 2),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // Lớp 4: Hứng tương tác
+                        Positioned.fill(
+                          child: Container(color: Colors.transparent),
+                        ),
                       ],
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
 
           // Bottom Bar: Chứa các nút điều khiển chính.
           bottomNavigationBar: Container(
             color: Colors.black,
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // Chúng ta dùng chiều cao cố định hoặc để Container tự thích ứng
+            height: 120,
+            child: Stack(
+              alignment: Alignment.center,
+              // Căn giữa tất cả các thành phần trong Stack
               children: [
-                // Nút Lưu ảnh: Bị vô hiệu hóa khi đang đếm.
-                IconButton(
-                  icon: const Icon(Icons.download_for_offline_rounded, color: Colors.white, size: 42),
-                  onPressed: _isCounting ? null : _saveImageToGallery,
-                ),
-                // Nút Đếm: Bị vô hiệu hóa khi đang đếm hoặc chưa chọn mode.
-                ElevatedButton(
-                  onPressed: (_isCounting || _selectedMode == null) ? null : _startCounting,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    disabledBackgroundColor: Colors.grey,
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                  ),
-                  child: const Text('COUNT',
+                // 1. Nút COUNT nằm chính giữa Stack (và cũng là chính giữa màn hình)
+                Align(
+                  alignment: Alignment.center,
+                  child: ElevatedButton(
+                    onPressed: (_isCounting || _selectedMode == null)
+                        ? null
+                        : _startCounting,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      disabledBackgroundColor: Colors.grey,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 5),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15)),
+                    ),
+                    child: const Text(
+                      'COUNT',
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Lexend',
-                          shadows: [Shadow(blurRadius: 15.0, color: Colors.black, offset: Offset(0, 0))])),
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Lexend',
+                        shadows: [Shadow(blurRadius: 15.0,
+                            color: Colors.black,
+                            offset: Offset(0, 0))
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                // Bộ chọn Mode: Hiển thị mode hiện tại và cho phép chọn mode khác.
-                ModeSelector(
-                  currentModeName: _selectedMode?.name ?? 'Chọn Mode',
-                  currentModeImage: _selectedMode?.image,
-                  onModeSelected: (id, name, img) {
-                    final newMode = SelectedMode(targetClass: id, name: name, image: img);
-                    // Lưu mode mới được chọn vào bộ nhớ.
-                    _prefsService.saveSelectedMode(newMode);
-                    // Cập nhật state với mode mới và xóa kết quả cũ.
-                    setState(() {
-                      _selectedMode = newMode;
-                      _detectionResults = [];
-                    });
-                  },
+
+                // 2. Nút bên trái và bên phải dùng Row để đẩy ra hai biên
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Nút Lưu ảnh
+                    IconButton(
+                      icon: const Icon(Icons.download_for_offline_rounded,
+                          color: Colors.white, size: 45),
+                      onPressed: _isCounting ? null : _saveImageToGallery,
+                    ),
+
+                    // Bộ chọn Mode
+                    ModeSelector(
+                      currentModeName: _selectedMode?.name ?? 'Chọn Mode',
+                      currentModeImage: _selectedMode?.image,
+                      onModeSelected: (id, name, img) {
+                        final newMode = SelectedMode(
+                            targetClass: id, name: name, image: img);
+                        _prefsService.saveSelectedMode(newMode);
+                        setState(() {
+                          _selectedMode = newMode;
+                          _detectionResults = [];
+                        });
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

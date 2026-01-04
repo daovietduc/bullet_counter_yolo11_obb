@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 /// Một widget Drawer để hiển thị các tùy chọn cài đặt giao diện.
-///
 /// Cho phép người dùng bật/tắt các yếu tố như bounding box, độ tin cậy,
 /// cũng như tùy chỉnh màu sắc và độ trong suốt của chúng.
 class DisplayOptionsDrawer extends StatelessWidget {
@@ -254,10 +253,10 @@ class DisplayOptionsDrawer extends StatelessWidget {
     // Chuyển thành static const để không phải tạo lại mỗi lần hàm được gọi
     const List<Map<String, dynamic>> opacityOptions = [
       {'label': 'Trong suốt (0%)', 'value': 0},
-      {'label': 'Mờ nhẹ (25%)', 'value': 64},
-      {'label': 'Mờ vừa (50%)', 'value': 128},
-      {'label': 'Mờ cao (75%)', 'value': 192},
-      {'label': 'Màu đặc (100%)', 'value': 255},
+      {'label': 'Mờ nhẹ (25%)', 'value': 0.25},
+      {'label': 'Mờ vừa (50%)', 'value': 0.5},
+      {'label': 'Mờ cao (75%)', 'value': 0.75},
+      {'label': 'Màu đặc (100%)', 'value': 1.0},
     ];
 
     showCupertinoModalPopup(
