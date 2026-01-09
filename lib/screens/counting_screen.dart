@@ -114,7 +114,7 @@ class _CountingScreenState extends State<CountingScreen> {
     UIHelper.showLoadingIndicator(context, message: 'AI is processing...');
 
     // Chờ một khoảng ngắn để đảm bảo UI kịp cập nhật trước khi bắt đầu tác vụ nặng.
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future.delayed(const Duration(milliseconds: 350));
 
     try {
       // Tải model TFLite từ assets.
@@ -194,9 +194,8 @@ class _CountingScreenState extends State<CountingScreen> {
         child: Scaffold(
           backgroundColor: Colors.black,
           appBar: PreferredSize(
-            // B1: Đặt chiều cao mong muốn cho toàn bộ khu vực AppBar
-            preferredSize: const Size.fromHeight(70.0), // Ví dụ: 100 pixels
-            // B2: Đặt AppBar của bạn vào làm child
+            // Đặt chiều cao cho toàn bộ khu vực AppBar
+            preferredSize: const Size.fromHeight(70.0),
             child: AppBar(
               centerTitle: true,
               backgroundColor: Colors.black,
@@ -233,7 +232,7 @@ class _CountingScreenState extends State<CountingScreen> {
                       text: TextSpan(
                         children: [
                           const TextSpan(
-                              text: '(Mode: ',
+                              text: '- Mode: ',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,)),
@@ -243,7 +242,7 @@ class _CountingScreenState extends State<CountingScreen> {
                                 color: Colors.deepOrange,
                                 fontSize: 14,)),
                           const TextSpan(
-                              text: ')', // Dấu ngoặc đơn đóng ở cuối
+                              text: ' -', // Dấu ngoặc đơn đóng ở cuối
                               style: TextStyle(
                                 color: Colors.white,
                                 // Cùng style với chữ '(Mode: '

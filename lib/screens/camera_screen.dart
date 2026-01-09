@@ -55,37 +55,41 @@ class _CameraScreenState extends State<CameraScreen> {
 
     return Scaffold(
       // 1. App Bar: Chứa các điều khiển flash, tiêu đề, và các action khác.
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        centerTitle: true,
-        // Nút điều khiển flash.
-        leading: IconButton(
-          icon: Icon(
-            cameraService.currentFlashMode == FlashMode.off
-                ? Icons.flash_off
-                : Icons.flash_on,
-            color: cameraService.currentFlashMode == FlashMode.off
-                ? Colors.white
-                : Colors.yellow,
+      appBar: PreferredSize(
+        // Đặt chiều cao cho toàn bộ khu vực AppBar
+        preferredSize: const Size.fromHeight(70.0),
+        child: AppBar(
+          backgroundColor: Colors.black,
+          centerTitle: true,
+          // Nút điều khiển flash.
+          leading: IconButton(
+            icon: Icon(
+              cameraService.currentFlashMode == FlashMode.off
+                  ? Icons.flash_off
+                  : Icons.flash_on,
+              color: cameraService.currentFlashMode == FlashMode.off
+                  ? Colors.white
+                  : Colors.yellow,
+            ),
+            onPressed: cameraService.toggleFlashMode,
           ),
-          onPressed: cameraService.toggleFlashMode,
+          title: const Text(
+            'BULLET COUNTER',
+            style: TextStyle(
+              color: Colors.white70,
+              fontFamily: 'UTM_Helvet',
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            ),
+          ),
+          actions: <Widget>[
+            // Nút thay đổi tỷ lệ khung hình (Tạm thời vô hiệu hóa).
+            IconButton(
+              icon: const Icon(Icons.aspect_ratio, color: Colors.white),
+              onPressed: () => UIHelper.showMaintenanceSnackBar(context),
+            ),
+          ],
         ),
-        title: const Text(
-          'BULLET COUNTER',
-          style: TextStyle(
-            color: Colors.white70,
-            fontFamily: 'UTM_Helvet',
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
-        ),
-        actions: <Widget>[
-          // Nút thay đổi tỷ lệ khung hình (Tạm thời vô hiệu hóa).
-          IconButton(
-            icon: const Icon(Icons.aspect_ratio, color: Colors.white),
-            onPressed: () => UIHelper.showMaintenanceSnackBar(context),
-          ),
-        ],
       ),
 
       // 2. Camera Preview: Hiển thị luồng video từ camera.
@@ -123,7 +127,7 @@ class _CameraScreenState extends State<CameraScreen> {
           Positioned.fill(
             child: AnimatedOpacity(
               opacity: _showFlashEffect ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 150),
+              duration: const Duration(milliseconds: 400),
               curve: Curves.easeOut,
               child: IgnorePointer(
                 child: Container(color: Colors.black),
@@ -136,7 +140,7 @@ class _CameraScreenState extends State<CameraScreen> {
       // 3. Bottom Toolbar: Chứa nút chụp, thư viện và chuyển camera.
       bottomNavigationBar: Container(
         color: Colors.black,
-        padding: const EdgeInsets.only(bottom: 20.0),
+        padding: const EdgeInsets.only(bottom: 0.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
