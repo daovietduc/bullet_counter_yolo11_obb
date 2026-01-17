@@ -83,7 +83,7 @@ class _CameraScreenState extends State<CameraScreen> {
             ),
           ),
           actions: <Widget>[
-            // Nút thay đổi tỷ lệ khung hình (Tạm thời vô hiệu hóa).
+            // Nút thay đổi tỷ lệ khung hình.
             IconButton(
               icon: const Icon(Icons.aspect_ratio, color: Colors.white),
               onPressed: () => UIHelper.showMaintenanceSnackBar(context),
@@ -127,7 +127,7 @@ class _CameraScreenState extends State<CameraScreen> {
           Positioned.fill(
             child: AnimatedOpacity(
               opacity: _showFlashEffect ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 400),
+              duration: const Duration(milliseconds: 100),
               curve: Curves.easeOut,
               child: IgnorePointer(
                 child: Container(color: Colors.black),

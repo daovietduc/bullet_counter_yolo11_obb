@@ -225,7 +225,6 @@ class DisplayOptionsDrawer extends StatelessWidget {
       {'name': 'Xanh dương', 'color': Colors.blue},
       {'name': 'Xanh accent', 'color': Colors.cyanAccent},
       {'name': 'Tím', 'color': Colors.purple},
-      {'name': 'Cam', 'color': Colors.orange},
     ];
 
     showCupertinoModalPopup(

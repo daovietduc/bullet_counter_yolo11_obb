@@ -119,6 +119,7 @@ class _CountingScreenState extends State<CountingScreen> {
     try {
       // Tải model TFLite từ assets.
       await _countingService.loadModel('assets/yolo11m_obb_bullet_couter_preview_float16.tflite');
+      //await _countingService.loadModel('assets/yolo11s-obb_float16.tflite');
       // Gọi service để thực hiện nhận diện đối tượng trên ảnh.
       final results = await _countingService.countObjects(
           widget.imagePath,
@@ -328,7 +329,7 @@ class _CountingScreenState extends State<CountingScreen> {
               return InteractiveViewer(
                 clipBehavior: Clip.none,
                 minScale: 1.0,
-                maxScale: 5.0,
+                maxScale: 4.0,
                 child: Container( // Sử dụng Container bao toàn bộ vùng body
                   width: constraints.maxWidth,
                   height: constraints.maxHeight,
@@ -366,7 +367,7 @@ class _CountingScreenState extends State<CountingScreen> {
                             ),
                           ),
 
-                        // Lớp 3: Viền (Khôi phục lớp viền Amber của bạn)
+                        // Lớp 3: Viền của ảnh
                         Positioned.fill(
                           child: IgnorePointer(
                             child: Container(
@@ -422,9 +423,7 @@ class _CountingScreenState extends State<CountingScreen> {
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Lexend',
-                        shadows: [Shadow(blurRadius: 15.0,
-                            color: Colors.black,
-                            offset: Offset(0, 0))
+                        shadows: [Shadow(blurRadius: 15.0, color: Colors.black, offset: Offset(0, 0))
                         ],
                       ),
                     ),

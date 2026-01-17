@@ -34,8 +34,16 @@ class UIHelper {
                 AnimatedBuilder(
                   animation: animation,
                   builder: (context, child) {
-                    // Giá trị sigma chạy từ 0 đến 3 theo tiến trình của animation
-                    double sigmaValue = animation.value * 3;
+                    // 1. Tính toán giá trị trung gian mượt mà với Curves
+                    final double curvedValue = Curves.easeInOut.transform(animation.value);
+
+                    // 2. Tính toán Sigma (Độ mờ)
+                    double sigmaValue = curvedValue * 3.5;
+
+                    // 3. Tính toán Alpha (Độ trong suốt của màu nền)
+                    // 0.2 opacity tương đương với Alpha khoảng 51 (0.2 * 255)
+                    int alphaValue = (curvedValue * 51).round();
+
                     return Positioned.fill(
                       child: BackdropFilter(
                         filter: ImageFilter.blur(
@@ -43,8 +51,7 @@ class UIHelper {
                           sigmaY: sigmaValue,
                         ),
                         child: Container(
-                          // Độ đậm của lớp phủ đen cũng tăng dần
-                          color: Colors.black.withOpacity(animation.value * 0.2),
+                          color: Colors.black.withAlpha(alphaValue),
                         ),
                       ),
                     );
